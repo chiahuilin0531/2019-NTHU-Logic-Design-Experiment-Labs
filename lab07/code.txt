@@ -1,0 +1,44 @@
+always@(posedge clk or posedge rst) begin
+	if (rst) begin
+		h_position <= 0;
+		v_position <= 0;
+	end else begin
+		h_position <= next_h_position;
+		v_position <= next_h_position;
+	end
+end
+
+
+always@* begin
+	next_h_position <= h_position;
+	next_v_position <= h_position;
+	case(state)
+		往上捲: begin
+			next_v_position = v_position – 1;
+		end
+		
+		往下捲: begin
+			next_v_position = v_position + 1;
+		end
+		
+		往左捲: begin
+			next_h_position = h_position – 1;
+		end
+		
+		往右捲: begin
+			next_h_position = h_position + 1;
+		end
+	endcase
+		
+end
+
+reg [1:0] flip;
+
+
+assign addr = (flip = = 0)? ((h_cnt>>1) + h_position 	     + ((v_cnt>>1) + v_position) * 320)) % 76800 : 		//正常
+
+	      (flip = = 1)? ((h_cnt>>1) + h_position 	     + ((240 - (v_cnt>>1)) - v_position) * 320)) % 76800 : 	//上下翻
+
+	      (flip = = 2)? ((320 - (h_cnt>>1)) - h_position + ((v_cnt>>1) + v_position) * 320)) % 76800 : 		//左右翻
+
+	      		    ((320 - (h_cnt>>1)) - h_position + ((240 - (v_cnt>>1)) - v_position) * 320)) % 76800 ; 	//上下左右翻
